@@ -1,0 +1,7 @@
+﻿  entity.cpp
+  main.cpp
+  polyplay.cpp
+C:\Users\Test\Documents\C++\whynofolder\collisionhopefully\source\polyplay.cpp(14,11): error C2146: syntax error: missing ';' before identifier 'poly'
+C:\Users\Test\Documents\C++\whynofolder\collisionhopefully\source\polyplay.cpp(14,3): warning C4551: function call missing argument list
+C:\Users\Test\Documents\C++\whynofolder\collisionhopefully\source\polyplay.cpp(14,11): error C2065: 'poly': undeclared identifier
+  Generating Code...
