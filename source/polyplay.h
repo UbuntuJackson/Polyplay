@@ -1,15 +1,20 @@
 #pragma once
 
 #include "olcPixelGameEngine.h"
-#include "entity.h"
+//#include "entity.h"
+
+class Polygon_;
+class DynamicPolygon_;
+struct Ray;
 
 class Polyplay : public olc::PixelGameEngine
 {
 public:
 	Polyplay();
+	DynamicPolygon_ *Player;
 	std::vector<Polygon_*> polyvec;
 	
-	bool RayVsSide(Ray* r, olc::vf2d* rayStart, olc::vf2d* rayEnd, olc::vf2d*, float* t);
+	bool RayVsSide(olc::vf2d lineStart, olc::vf2d lineEnd, olc::vf2d rayStart, olc::vf2d rayEnd, olc::vf2d*, float* t);
 
 	bool OnUserCreate();
 
