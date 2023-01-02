@@ -25,7 +25,11 @@ DynamicPolygon_::DynamicPolygon_(std::initializer_list<olc::vf2d> ls) {
 void DynamicPolygon_::Update(Polyplay* polyplay, float _elapsedTime) {
 	olc::vf2d intersectionP;
 	float time;
-	std::vector<float> times;
+	//std::vector<float> times;
+	std::vector<olc::vf2d> contacts;
+	olc::vf2d contact_normal;
+	olc::vf2d contact_side;
+	std::vector<std::pair<float, olc::vf2d>> times;
 	
 	if (polyplay->GetKey(olc::Key::LEFT).bHeld) vel.x -= 0.1f * _elapsedTime;
 	if (polyplay->GetKey(olc::Key::RIGHT).bHeld) vel.x += 0.1f * _elapsedTime;
@@ -36,8 +40,22 @@ void DynamicPolygon_::Update(Polyplay* polyplay, float _elapsedTime) {
 		for (int i = 0; i < polyplay->polyvec.size(); i++) { //for every polygon
 			for (int j = 0; j < polyplay->polyvec[i]->points.size(); j++) { //for every point in every polygon
 				if (polyplay->RayVsSide(points[p], (points[p] + vel), polyplay->polyvec[i]->points[j], polyplay->polyvec[i]->points[(j + 1) % polyplay->polyvec[i]->points.size()], &intersectionP, &time)) {
+					contact_side = polyplay->polyvec[i]->points[j] - polyplay->polyvec[i]->points[(j + 1) % polyplay->polyvec[i]->points.size()];
+					times.push_back({ time, contact_side});
+					std::sort(times.begin(), times.end(), [](const std::pair<float, olc::vf2d>& a, const std::pair<float, olc::vf2d>& b)
+						{
+							return a.first < b.first;
+						});
+
+					std::cout << contact_normal.x << ", " << contact_normal.y << std::endl;
+
 					
-					times.push_back(time);
+					polyplay->CalculateNormal(
+						times[0].second,
+						vel,
+						contact_normal
+					);
+					vel += contact_normal * olc::vf2d(std::abs(vel.x), std::abs(vel.y)) * (1 - times[0].first);
 					
 
 				}
@@ -48,16 +66,13 @@ void DynamicPolygon_::Update(Polyplay* polyplay, float _elapsedTime) {
 	}
 	
 
-
-	if (times.size() != 0) std::cout << times[0] << std::endl;
-	std::sort(times.begin(), times.end(), [](const float& a, const float& b)
-		{
-			return a < b;
-		});
-
-	if(times.size() != 0) vel -= vel * (1 - times[0]);
-
-	for (int p = 0; p < points.size(); p++) points[p] += vel;
+	
+	
+	
+	for (int p = 0; p < points.size(); p++){
+		points[p] += vel;
+		
+	}
 
 	
 }
@@ -84,5 +99,6 @@ void DynamicPolygon_::Update(Polyplay* polyplay, float _elapsedTime) {
 void DynamicPolygon_::Draw(olc::PixelGameEngine* pge) {
 	for (int i = 0; i < points.size(); i++) {
 		pge->DrawLine(points[i], points[(i + 1) % points.size()], olc::WHITE);
+		pge->DrawLine(points[i], points[i] + vel, olc::RED);
 	}
 }
