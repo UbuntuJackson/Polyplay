@@ -31,15 +31,16 @@
 		
 	}
 
-	void Polyplay::CalculateNormal(olc::vf2d &_side, olc::vf2d &_velocity, olc::vf2d &_normal) {
-		_normal.x = -_side.y;
-		_normal.y = _side.x;
-		if (_velocity.x * _side.x + _velocity.y * _side.y < 0.0f) {
-			_normal.x = _side.y;
-			_normal.y = -_side.x;
+	void Polyplay::CalculateNormal(const olc::vf2d &_side, const olc::vf2d &_velocity, olc::vf2d &_normal) {
+		_normal.x = _side.y;
+		_normal.y = -_side.x;
+		if (_velocity.x * _normal.x + _velocity.y * _normal.y > 0.0f) {
+			_normal.x = -_side.y;
+			_normal.y = _side.x;
 		}
+		
 		_normal = {
-			_normal.x / (sqrtf(_normal.x * _normal.x + _normal.y * _normal.y)), _normal.y / (sqrtf(_normal.x * _normal.x + _normal.y * _normal.y))
+			_normal.x / (std::sqrt(_normal.x * _normal.x + _normal.y * _normal.y)), _normal.y / (std::sqrt(_normal.x * _normal.x + _normal.y * _normal.y))
 		};
 		
 	}

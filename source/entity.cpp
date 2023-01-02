@@ -31,10 +31,10 @@ void DynamicPolygon_::Update(Polyplay* polyplay, float _elapsedTime) {
 	olc::vf2d contact_side;
 	std::vector<std::pair<float, olc::vf2d>> times;
 	
-	if (polyplay->GetKey(olc::Key::LEFT).bHeld) vel.x -= 0.1f * _elapsedTime;
-	if (polyplay->GetKey(olc::Key::RIGHT).bHeld) vel.x += 0.1f * _elapsedTime;
-	if (polyplay->GetKey(olc::Key::UP).bHeld) vel.y -= 0.1f * _elapsedTime;
-	if (polyplay->GetKey(olc::Key::DOWN).bHeld) vel.y += 0.1f * _elapsedTime;
+	if (polyplay->GetKey(olc::Key::LEFT).bHeld) vel.x -= 0.0001f;
+	if (polyplay->GetKey(olc::Key::RIGHT).bHeld) vel.x += 0.0001f;
+	if (polyplay->GetKey(olc::Key::UP).bHeld) vel.y -= 0.0001f;
+	if (polyplay->GetKey(olc::Key::DOWN).bHeld) vel.y += 0.0001f;
 
 	for (int p = 0; p < points.size(); p++) {
 		for (int i = 0; i < polyplay->polyvec.size(); i++) { //for every polygon
@@ -46,7 +46,7 @@ void DynamicPolygon_::Update(Polyplay* polyplay, float _elapsedTime) {
 						{
 							return a.first < b.first;
 						});
-
+					
 					std::cout << contact_normal.x << ", " << contact_normal.y << std::endl;
 
 					
