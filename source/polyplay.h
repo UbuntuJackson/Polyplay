@@ -15,6 +15,7 @@ public:
 	std::vector<Polygon_*> polyvec;
 	
 	bool RayVsSide(olc::vf2d lineStart, olc::vf2d lineEnd, olc::vf2d rayStart, olc::vf2d rayEnd, olc::vf2d*, float* t);
+	void CalculateNormal(olc::vf2d& _side, olc::vf2d& _velocity, olc::vf2d& _normal);
 
 	bool OnUserCreate();
 
