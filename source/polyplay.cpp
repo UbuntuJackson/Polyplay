@@ -19,12 +19,14 @@
 		float t1 = ((line_r2s.y - line_r2e.y) * (line_r1s.x - line_r2s.x) + (line_r2e.x - line_r2s.x) * (line_r1s.y - line_r2s.y)) / h;
 		float t2 = ((line_r1s.y - line_r1e.y) * (line_r1s.x - line_r2s.x) + (line_r1e.x - line_r1s.x) * (line_r1s.y - line_r2s.y)) / h;
 		
+		*_intersection = lineStart + t1 * (lineEnd - lineStart);
+		*t = t1;
 		
-
 		
 
 		if (t1 <= 1.0f && t1 >= 0.0f && t2 <= 1.0f && t2 >= 0.0f) {
-			*t = t1;
+			
+			
 			return true;
 		}
 		return false;
@@ -34,22 +36,35 @@
 	void Polyplay::CalculateNormal(const olc::vf2d &_side, const olc::vf2d &_velocity, olc::vf2d &_normal) {
 		_normal.x = _side.y;
 		_normal.y = -_side.x;
+		if (_normal.y > 0.0f) {
+			_normal.x = -_side.y;
+			_normal.y = _side.x;
+		}
 		if (_velocity.x * _normal.x + _velocity.y * _normal.y > 0.0f) {
 			_normal.x = -_side.y;
 			_normal.y = _side.x;
 		}
+		if (std::abs(_velocity.x * _normal.x + _velocity.y * _normal.y) <= 0.00000001f) {
+			if (_normal.y >= 0.0f) {
+				_normal.x = -_side.y;
+				_normal.y = _side.x;
+			}
+		}
 		
-		_normal = {
-			_normal.x / (std::sqrt(_normal.x * _normal.x + _normal.y * _normal.y)), _normal.y / (std::sqrt(_normal.x * _normal.x + _normal.y * _normal.y))
-		};
+		_normal = _normal.norm();
 		
 	}
 
 	bool Polyplay::OnUserCreate()
 	{
 		
-		polyvec.push_back(new Polygon_{ { 20.0f, 20.0f }, {80.0f, 20.0f}, {80.0f, 200.0f}, {20.0f, 100.0f} });
-		Player = new DynamicPolygon_{ { 200.0f, 200.0f }, {220.0f, 220.0f}, {200.0f, 210.0f} };
+		//polyvec.push_back(new Polygon_{ { 20.0f, 20.0f }, {80.0f, 20.0f}, {80.0f, 200.0f}, {20.0f, 100.0f} });
+		polyvec.push_back(new Polygon_{ { 100.0f, 50.0f }, {200.0f, 50.0f}, {200.0f, 60.0f}, {100.0f, 60.0f} });
+		polyvec.push_back(new Polygon_{ { 50.0f, 50.0f }, {75.0f, 50.0f}, {50.0f, 75.0f} });
+		polyvec.push_back(new Polygon_{ { 0.0f, 50.0f }, {50.0f, 50.0f}, {50.0f, 230.0f}, {0.0f, 230.0f} });
+		polyvec.push_back(new Polygon_{ { 0.0f + 50.0f, 100.0f }, {100.0f + 50.0f, 200.0f}, {100.0f + 50.0f, 230.0f}, {0.0f + 50.0f, 230.0f} });
+		polyvec.push_back(new Polygon_{ { 100.0f + 50.0f, 200.0f }, {200.0f + 50.0f, 200.0f}, {200.0f + 50.0f, 240.0f}, {100.0f + 50.0f, 240.0f} });
+		Player = new DynamicPolygon_{ { 20.0f, 20.0f }, {30.0f, 20.0f}, {30.0f, 30.0f}, {20, 30 } };
 
 		
 		
@@ -60,10 +75,10 @@
 
 	bool Polyplay::OnUserUpdate(float fElapsedTime)
 	{
-		
+		Clear(olc::BLUE);
 		Player->Update(this, fElapsedTime);
 		
-		Clear(olc::BLUE);
+		
 
 		for(int i = 0; i < polyvec.size(); i++)
 			polyvec[i] -> Draw(this);

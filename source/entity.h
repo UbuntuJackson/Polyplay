@@ -4,8 +4,8 @@
 
 struct Ray{
 public:
-	olc::vf2d pos;
-	olc::vf2d vel;
+	olc::vf2d start;
+	olc::vf2d end;
 
 };
 

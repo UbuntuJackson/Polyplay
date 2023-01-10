@@ -25,40 +25,56 @@ DynamicPolygon_::DynamicPolygon_(std::initializer_list<olc::vf2d> ls) {
 void DynamicPolygon_::Update(Polyplay* polyplay, float _elapsedTime) {
 	olc::vf2d intersectionP;
 	float time;
+	float normal_time;
 	//std::vector<float> times;
 	std::vector<olc::vf2d> contacts;
 	olc::vf2d contact_normal;
-	olc::vf2d contact_side;
-	std::vector<std::pair<float, olc::vf2d>> times;
-	
+	Ray contact_side;
+	olc::vf2d contact_side_vec;
+	std::vector<std::pair<float, Ray>> times;
+	vel.y += 0.0001f;
 	if (polyplay->GetKey(olc::Key::LEFT).bHeld) vel.x -= 0.0001f;
 	if (polyplay->GetKey(olc::Key::RIGHT).bHeld) vel.x += 0.0001f;
-	if (polyplay->GetKey(olc::Key::UP).bHeld) vel.y -= 0.0001f;
-	if (polyplay->GetKey(olc::Key::DOWN).bHeld) vel.y += 0.0001f;
+	
+	if (polyplay->GetKey(olc::Key::UP).bPressed) vel.y = -0.1f;
+	
 
 	for (int p = 0; p < points.size(); p++) {
 		for (int i = 0; i < polyplay->polyvec.size(); i++) { //for every polygon
 			for (int j = 0; j < polyplay->polyvec[i]->points.size(); j++) { //for every point in every polygon
-				if (polyplay->RayVsSide(points[p], (points[p] + vel), polyplay->polyvec[i]->points[j], polyplay->polyvec[i]->points[(j + 1) % polyplay->polyvec[i]->points.size()], &intersectionP, &time)) {
-					contact_side = polyplay->polyvec[i]->points[j] - polyplay->polyvec[i]->points[(j + 1) % polyplay->polyvec[i]->points.size()];
-					times.push_back({ time, contact_side});
-					std::sort(times.begin(), times.end(), [](const std::pair<float, olc::vf2d>& a, const std::pair<float, olc::vf2d>& b)
-						{
-							return a.first < b.first;
-						});
+				if (
+					polyplay->RayVsSide(
+						points[p],
+						(points[p] + vel),
+						polyplay->polyvec[i]->points[j],
+						polyplay->polyvec[i]->points[(j + 1) % polyplay->polyvec[i]->points.size()],
+						&intersectionP,
+						&time)
+				) {
+					contact_side = { polyplay->polyvec[i]->points[j] , polyplay->polyvec[i]->points[(j + 1) % polyplay->polyvec[i]->points.size()]};
 					
-					std::cout << contact_normal.x << ", " << contact_normal.y << std::endl;
-
+					contact_side_vec = contact_side.end - contact_side.start;
 					
 					polyplay->CalculateNormal(
-						times[0].second,
+						contact_side_vec,
 						vel,
 						contact_normal
 					);
-					vel += contact_normal * olc::vf2d(std::abs(vel.x), std::abs(vel.y)) * (1 - times[0].first);
-					
 
+					polyplay->RayVsSide(
+						points[p],
+						points[p] + contact_normal,
+						contact_side.start + vel * (1.0f - time),
+						contact_side.end + vel * (1.0f - time),
+						&intersectionP,
+						&normal_time
+					);
+
+					vel = vel - (intersectionP - points[p]);
+					std::cout << contact_normal.y << std::endl;
+					
 				}
+				
 				
 			}
 		}
